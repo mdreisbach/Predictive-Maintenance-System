@@ -78,5 +78,6 @@ function variablesRemove = preprocess(variableIndex)
     for i = 1:length(variableIndex)
         if sum(  ) == 0
             variableIndex(:,i) = []
-
+        end
+    end
 end
