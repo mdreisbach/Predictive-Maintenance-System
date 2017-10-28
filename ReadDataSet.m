@@ -15,10 +15,10 @@ dataSetSpeed9 = readtable('C:\Users\connorlof\Documents\School\Fall 2017\Softwar
 
 %Create Shipspeed and level position array
 shipSpeedArray = {'3 knots', '6 knots', '9 knots', '12 knots', '15 knots', '18 knots', '21 knots', '24 knots', '27 knots'};
-variableIndex = [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19];
+global variableIndex = [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19];
 graphPosIndex = [1,2,3,4,5,6,7,8,9];
 %dataSetArray = [dataSetSpeed1,dataSetSpeed2,dataSetSpeed3,dataSetSpeed4,dataSetSpeed5,dataSetSpeed6,dataSetSpeed7,dataSetSpeed8,dataSetSpeed9];
-
+local_preprocess(variableIndex);
 
 %Loop through variableIndex array and create a figure of 9 graphs for each
 for i = 1:length(variableIndex)
@@ -66,7 +66,7 @@ for i = 1:length(variableIndex)
 end
 
 
-function y = displayGraph(data, varIndex, plotIndex)
+function displayGraph(data, varIndex, plotIndex)
 
     subplot(3,3,plotIndex)
     plot(data.(1), data.(varIndex))
@@ -74,10 +74,11 @@ function y = displayGraph(data, varIndex, plotIndex)
     xlim([0,data.(1)(end)])
 end
 
-function variablesRemove = preprocess(variableIndex)
+function local_preprocess(variableIndex)
     for i = 1:length(variableIndex)
-        if sum(  ) == 0
-            variableIndex(:,i) = []
+        myTable = table2array(dataSet)
+        if sum(myTable(:,i)^2) == 0
+            variableIndex(i) = []
         end
     end
 end
