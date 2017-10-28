@@ -73,3 +73,10 @@ function y = displayGraph(data, varIndex, plotIndex)
     xlabel('Index')
     xlim([0,data.(1)(end)])
 end
+
+function variablesRemove = preprocess(variableIndex)
+    for i = 1:length(variableIndex)
+        if sum(  ) == 0
+            variableIndex(:,i) = []
+
+end
