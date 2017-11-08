@@ -1,13 +1,5 @@
 %Read in ship speed from an edited csv file and assign it to a DataSet
-dataSetSpeed = readtable('C:\Users\connorlof\Documents\School\Fall 2017\Software Eng\Files\Speed CSVs\dataSpeed7.csv','ReadVariableNames',false);
-
-%dataSetSpeed = readtable('C:\Users\connorlof\Documents\School\Fall 2017\Software Eng\Files\completeDataCsv.csv','ReadVariableNames',false);
-
-
-%dataSetSpeed = readtable('C:\Users\connorlof\Downloads\CMAPSSData\unit1csv.csv','ReadVariableNames',false);
-
-%Required for the NASA data set, remove first column
-%dataSetSpeed.Var1 = []
+dataSetSpeed = readtable('C:\Users\hydro\Documents\School\Fall 2017\Software Eng\github 11.3\Predictive-Maintenance-System-master\Data_Converter\Files\Speed CSVs\dataSpeed7.csv','ReadVariableNames',false);
 
 shipSpeedTitle = '21 knots';
 
@@ -82,8 +74,6 @@ function z = graphPca(data, shipSpeed)
     %Last points
     %g = findgroups(dataAsTable.Unit);
     lastPointsTall = score(end,1:2);
-    %get mid point of data
-    midPointsTall = score(round(end/2,0),1:2);
     %gether them into memory
     [firstPoints,lastPoints] = gather(firstPointsTall,lastPointsTall);
     
@@ -92,9 +82,16 @@ function z = graphPca(data, shipSpeed)
     hold on
     plot(score(:,1), score(:,2), '.','MarkerSize',12)
     plot(firstPoints(:,1),firstPoints(:,2),'g.','MarkerSize',16)
-    %plot(midPointsTall(:,1),midPointsTall(:,2),'y.','MarkerSize',16)
     plot(lastPoints(:,1),lastPoints(:,2),'r.','MarkerSize',16)
+    
+    idxAlarm = score(:,1) > 10 | score(:,1) < -7  | score(:,2) > 5 | score(:,2) < -4;
+    idxWarn = score(:,1) > 5 | score(:,1) < -6.5 | score(:,2) > 2 | score(:,2) < -3 & ~idxAlarm;
+    
+    patch([-10;-10;15;15;10;10;-7;-7;-10],[-5,8,8,-5,-5,5,5,-5,-5], 'r', 'FaceAlpha', 0.3)
+    patch([-7,-7,10,10,5,5,-6.5,-6.5,4.99,4.99,-6.5],[-5,5,5,-5,-5,2,2,-3,-3,-5,-5],'y','FaceColor',[1 .8 0], 'FaceAlpha', 0.3)
+    patch([-6.5,-6.5,5,5,-6.5],[-3,2,2,-3,-3],'g','FaceAlpha',0.3)
     hold off
+    
     axis equal
     xlabel('First Principal Component')
     ylabel('Second Principal Component')
@@ -102,5 +99,6 @@ function z = graphPca(data, shipSpeed)
     fullTitle3 = strcat('Scatter Plot of the First & Second Principal Components (',shipSpeed,')');
     
     title(fullTitle3)
+
     
 end
