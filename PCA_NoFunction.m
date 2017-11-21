@@ -1,5 +1,5 @@
 %Read in ship speed from an edited csv file and assign it to a DataSet
-dataSetSpeed = readtable('C:\Users\hydro\Documents\School\Fall 2017\Software Eng\github 11.3\Predictive-Maintenance-System-master\Data_Converter\Files\Speed CSVs\dataSpeed7.csv','ReadVariableNames',false);
+dataSetSpeed = readtable('C:\Users\Kyle\Desktop\Fall2017\SWeng\Predictive-Maintenance-System-master\Data_Converter\Files\Speed CSVs\dataSpeed7.csv','ReadVariableNames',false);
 
 %Function to calculate the pca for the called dataSet, as well as graph the
 %pca in a cumulative/indiviudal comparison plot for the # of principal
@@ -36,6 +36,21 @@ dataSetSpeed = readtable('C:\Users\hydro\Documents\School\Fall 2017\Software Eng
     coeff = pca(dataAsTable);
     [coeff,score,latent] = pca(dataAsTable);
 
+   
+    column1IQR = iqr(score(:,1));
+    column2IQR = iqr(score(:,2));
+    
+    %Normal IQR in Stats: 1.5/3.0
+    
+    %STRICT?(Default?): 1.5/2.0
+    %MEDIUM?: 1.25/1.75
+    %WEAK?: 1.0/1.5
+    
+    warningOutlierColumn1 = 1.5*column1IQR;
+    extremeOutlierColumn1 = 3.0*column1IQR;
+    
+    warningOutlierColumn2 = 1.5*column2IQR;
+    extremeOutlierColumn2 = 3.0*column2IQR;
 
     %Plot first and last data points
     %idxFirst = dataAsTable(1,:);
@@ -53,8 +68,8 @@ dataSetSpeed = readtable('C:\Users\hydro\Documents\School\Fall 2017\Software Eng
     plot(firstPoints(:,1),firstPoints(:,2),'g.','MarkerSize',16)
     plot(lastPoints(:,1),lastPoints(:,2),'r.','MarkerSize',16)
     
-    idxAlarm = score(:,1) > 10 | score(:,1) < -7  | score(:,2) > 5 | score(:,2) < -4;
-    idxWarn = score(:,1) > 5 | score(:,1) < -6.5 | score(:,2) > 2 | score(:,2) < -3 & ~idxAlarm;
+    idxAlarm = score(:,1) > extremeOutlierColumn1 | score(:,1) < -extremeOutlierColumn1  | score(:,2) > extremeOutlierColumn2 | score(:,2) < -extremeOutlierColumn2;
+    idxWarn = score(:,1) > warningOutlierColumn1  | score(:,2) > warningOutlierColumn2 | score(:,2) < -warningOutlierColumn2 & ~idxAlarm;
     
     patch([-10;-10;15;15;10;10;-7;-7;-10],[-5,8,8,-5,-5,5,5,-5,-5], 'r', 'FaceAlpha', 0.3)
     patch([-7,-7,10,10,5,5,-6.5,-6.5,4.99,4.99,-6.5],[-5,5,5,-5,-5,2,2,-3,-3,-5,-5],'y','FaceColor',[1 .8 0], 'FaceAlpha', 0.3)
