@@ -1,5 +1,10 @@
 %Read in ship speed from an edited csv file and assign it to a DataSet
-dataSetSpeed = readtable('C:\Users\Kyle\Desktop\Fall2017\SWeng\Predictive-Maintenance-System-master\Data_Converter\Files\Speed CSVs\dataSpeed7.csv','ReadVariableNames',false);
+dataSetSpeed = readtable('C:\Users\Ball\Desktop\Fall2017\SWeng\Predictive-Maintenance-System-master\Data_Converter\Files\Speed CSVs\dataSpeed7.csv','ReadVariableNames',false);
+
+%test is a just a blank text file with the setting choice (medium, weak,
+%strict, or anything else for default). The file was saved to the main
+%folder for the project.
+filetext = fileread('test.txt');
 
 %Function to calculate the pca for the called dataSet, as well as graph the
 %pca in a cumulative/indiviudal comparison plot for the # of principal
@@ -42,16 +47,42 @@ dataSetSpeed = readtable('C:\Users\Kyle\Desktop\Fall2017\SWeng\Predictive-Mainte
     
     %Normal IQR in Stats: 1.5/3.0
     
-    %STRICT?(Default?): 1.5/2.0
-    %MEDIUM?: 1.25/1.75
-    %WEAK?: 1.0/1.5
+    %STRICT(Default?): 1.5/2.0
+    %MEDIUM: 1.25/1.75
+    %WEAK: 1.0/1.5
+    switch filetext
+        case 'weak'
+            warningOutlierColumn1 = 1.0*column1IQR;
+            extremeOutlierColumn1 = 1.5*column1IQR;
     
-    warningOutlierColumn1 = 1.5*column1IQR;
-    extremeOutlierColumn1 = 3.0*column1IQR;
+            warningOutlierColumn2 = 1.0*column2IQR;
+            extremeOutlierColumn2 = 1.5*column2IQR;
+            
+        case 'medium'
+            warningOutlierColumn1 = 1.25*column1IQR;
+            extremeOutlierColumn1 = 1.75*column1IQR;
     
-    warningOutlierColumn2 = 1.5*column2IQR;
-    extremeOutlierColumn2 = 3.0*column2IQR;
-
+            warningOutlierColumn2 = 1.25*column2IQR;
+            extremeOutlierColumn2 = 1.75*column2IQR;
+            
+        case 'strict'
+            warningOutlierColumn1 = 1.5*column1IQR;
+            extremeOutlierColumn1 = 2.0*column1IQR;
+    
+            warningOutlierColumn2 = 1.5*column2IQR;
+            extremeOutlierColumn2 = 2.0*column2IQR;
+            
+        otherwise
+            warningOutlierColumn1 = 1.5*column1IQR;
+            extremeOutlierColumn1 = 3.0*column1IQR;
+    
+            warningOutlierColumn2 = 1.5*column2IQR;
+            extremeOutlierColumn2 = 3.0*column2IQR;
+            
+    end
+    
+    warningOutlierColumn1
+    extremeOutlierColumn1
     %Plot first and last data points
     %idxFirst = dataAsTable(1,:);
     firstPointsTall = score(1,1:2);
@@ -99,4 +130,4 @@ dataSetSpeed = readtable('C:\Users\Kyle\Desktop\Fall2017\SWeng\Predictive-Mainte
         
     end
     
-    classificationMatrix = cat(2,score(:,1),score(:,2),classOfData);
+classificationMatrix = cat(2,score(:,1),score(:,2),classOfData);
