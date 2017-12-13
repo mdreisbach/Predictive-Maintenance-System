@@ -20,6 +20,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -27,9 +28,15 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.CompoundBorder;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 
 public class SystemGUI extends JFrame {
 
+	public String dataLocationFilePath = "";
+	public String modelExecutableFilePath = "";
+	
 	SystemGUI() {
 		 	JRadioButton Low_Button   = new JRadioButton("Low");
 		 	JRadioButton Normal_Button    = new JRadioButton("Normal");
@@ -44,8 +51,11 @@ public class SystemGUI extends JFrame {
 		 	JLabel columnLabel = new JLabel("Column #:");
 		 	JTextField columnNum = new JTextField("",5);
 		 	
-		 	JTextField dataLocationPath = new JTextField("example/file/path...");
-		 	JTextField modelExecutablePath = new JTextField("example/file/path/model.exe");
+		 	JTextField dataLocationPathText =    new JTextField("example/file/path/data.csv",20);
+		 	JTextField modelExecutablePathText = new JTextField("example/file/path/model.exe",20);
+		 	
+		 	
+		 	
 		 	
 		 	//Create a button group and add the buttons.
 		 	ButtonGroup bgroup = new ButtonGroup();
@@ -83,14 +93,11 @@ public class SystemGUI extends JFrame {
 		 	No_Button.setSelected(true);
 		 	discretePanel.add(columnLabel);
 		 	discretePanel.add(columnNum);
-		 	//discretePanel.add(Confirm_Button);
 		 	
-		 	
-		 	dataLocation.add(dataLocationPath);
+		 	dataLocation.add(dataLocationPathText);
 		 	dataLocation.add(Change_Button1);
 		 	
-		 	
-		 	modelExecutable.add(modelExecutablePath);
+		 	modelExecutable.add(modelExecutablePathText);
 		 	modelExecutable.add(Change_Button2);
 		 	
 		 	
@@ -114,53 +121,112 @@ public class SystemGUI extends JFrame {
 			}
 		 	
 		 	//Title border to the button panel.
-	        radioPanel.setBorder(BorderFactory.createTitledBorder(
-	                   BorderFactory.createEtchedBorder(), "Validation Strength"));
+		 	radioPanel.setBorder(BorderFactory.createTitledBorder(
+		 			BorderFactory.createEtchedBorder(), "Validation Strength"));
+
+		 	discretePanel.setBorder(new CompoundBorder(
+		 			BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLUE), 
+		 			BorderFactory.createMatteBorder(0, 0, 1, 0, Color.RED)));
+
+		 	discretePanel.setBorder(BorderFactory.createTitledBorder(
+		 			BorderFactory.createEtchedBorder(), "Has Discrete Column?"));
+
+		 	dataLocation.setBorder(BorderFactory.createTitledBorder(
+		 			BorderFactory.createEtchedBorder(), "Training Data Location"));
+
+		 	modelExecutable.setBorder(BorderFactory.createTitledBorder(
+		 			BorderFactory.createEtchedBorder(), "Trained Model Executable"));        
+
+
 	        
-	        discretePanel.setBorder(new CompoundBorder(
-	        	    BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLUE), 
-	        	    BorderFactory.createMatteBorder(0, 0, 1, 0, Color.RED)));
 	        
-	        discretePanel.setBorder(BorderFactory.createTitledBorder(
-	                   BorderFactory.createEtchedBorder(), "Has Discrete Column?"));
-	        
-	        dataLocation.setBorder(BorderFactory.createTitledBorder(
-	                   BorderFactory.createEtchedBorder(), "Training Data Location"));
-	        
-	        modelExecutable.setBorder(BorderFactory.createTitledBorder(
-	                   BorderFactory.createEtchedBorder(), "Trained Model Executable"));        
-	        
-	        
+	        //Set the file types that the user can browse for
+	        //Only allow CSV right now
+	        JFileChooser fileSelect = new JFileChooser();
+	        FileFilter csv = new FileNameExtensionFilter("CSV Files", new String[] { "csv" });
+	        FileFilter exe = new FileNameExtensionFilter("Exe Files", new String[] { "exe" });
+
+	        fileSelect.setFileFilter(csv);
+
+	        Change_Button1.addActionListener(new ActionListener() {
+	        	@Override
+	        	public void actionPerformed(ActionEvent e) {
+	        		JFileChooser chooser = new JFileChooser();
+
+	        		//File path for Training Data Location
+	    		 	String dataLocationPath = "";
+	    		 	
+	        		chooser.setFileFilter(csv);
+	        		int returnVal = chooser.showOpenDialog(null);
+	        		if(returnVal == JFileChooser.APPROVE_OPTION) {
+	        			
+	        			dataLocationPath = fileSelect.getSelectedFile().getAbsolutePath();
+	        			dataLocationPathText.setText(dataLocationPath);
+	        			setDataLocationFilePath(dataLocationPath);
+	        			System.out.println("You chose to open this file: " +
+	        					chooser.getSelectedFile().getName());
+	        		}}
+	        });
+
+
+	        Change_Button2.addActionListener(new ActionListener() {
+	        	@Override
+	        	public void actionPerformed(ActionEvent e) {
+	        		JFileChooser chooser = new JFileChooser();
+
+	        		//File path for Trained Model Executable
+	        		String modelExecutablePath = "";
+	    		 	
+	        		chooser.setFileFilter(exe);
+	        		int returnVal = chooser.showOpenDialog(null);
+	        		if(returnVal == JFileChooser.APPROVE_OPTION) {
+	        			
+	        			modelExecutablePath = fileSelect.getSelectedFile().getAbsolutePath();
+	        			modelExecutablePathText.setText(modelExecutablePath);
+	        			setModelExecutableFilePath(modelExecutablePath);
+	        			System.out.println("You chose to open this file: " +
+	        					chooser.getSelectedFile().getName());
+	        		}}
+	        });
+
+
 		 	Confirm_Button.addActionListener(new ActionListener() {
 		 	    @Override
 		        public void actionPerformed(ActionEvent e) {
 		            if(Low_Button.isSelected()){
-		            	createTextFile(0,columnNum.getText());
+		            	createTextFile(0,columnNum.getText(),getDataLocationFilePath(),getModelExecutableFilePath());
+		            
 		            	if(Yes_Button.isSelected()&&columnNum.getText().equals("")){
 		            		 JOptionPane.showMessageDialog(null, "Please enter a column number." , "WARNING", JOptionPane.INFORMATION_MESSAGE);
 		            	} else {
 		            	System.exit(0);
 		            	}
+		            	
 		            } else if(Normal_Button.isSelected()){
-		            	createTextFile(0,columnNum.getText());
+		            	createTextFile(0,columnNum.getText(),getDataLocationFilePath(),getModelExecutableFilePath());
+		            		
 		            	if(Yes_Button.isSelected()&&columnNum.getText().equals("")){
 		            		 JOptionPane.showMessageDialog(null, "Please enter a column number." , "WARNING", JOptionPane.INFORMATION_MESSAGE);
 		            	} else {
 		            	System.exit(0);
 		            	}
 		            } else if(Strict_Button.isSelected()){
-		            	createTextFile(0,columnNum.getText());
-		            	if(Yes_Button.isSelected()&&columnNum.getText().equals("")){
-		            		 JOptionPane.showMessageDialog(null, "Please enter a column number." , "WARNING", JOptionPane.INFORMATION_MESSAGE);
-		            	} else {
-		            	System.exit(0);
-		            	}
+		            	createTextFile(0,columnNum.getText(),getDataLocationFilePath(),getModelExecutableFilePath());
+		            	
+		            
 		            }
+		        	if(Yes_Button.isSelected()&&columnNum.getText().equals("")){
+	            		 JOptionPane.showMessageDialog(null, "Please enter a column number." , "WARNING", JOptionPane.INFORMATION_MESSAGE);
+	            	} else {
+	            	System.exit(0);
+	            	}
+		        	
+		 	    }	
 
-		        }
+		        
 		 	});
 		 	//... Set window attributes.
-		 	Container pane = null; 
+		 	Container pane = new Container();
 		 	pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
 		 	
 		 	dataLocation.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -177,11 +243,12 @@ public class SystemGUI extends JFrame {
 	        
 	        Confirm_Button.setAlignmentX(Component.CENTER_ALIGNMENT);
 	        pane.add(Confirm_Button);
-		 	
+
 //		 	setContentPane(radioPanel);  // Button panel is only content.
 //		 	setContentPane(discretePanel);
 	        
 	        frame.add(pane);
+	        frame.setTitle("Settings");
 		 	frame.pack();                      // Layout window.
 			frame.setVisible(true);
 	}
@@ -210,20 +277,20 @@ public class SystemGUI extends JFrame {
 	}
 	
 	
-	public void createTextFile(int i, String columnNum) {
+	public void createTextFile(int i, String columnNum, String dataLocationPath, String modelExecutablePath) {
 		try {
 			PrintWriter writer = new PrintWriter("the-file-name.txt", "UTF-8");
 			switch (i){
 				case 0:
-					writer.println("low" + "," + columnNum);
+					writer.println("low" + "," + columnNum + "," + dataLocationPath + "," + modelExecutablePath);
 					writer.close();
 					break;
 				case 1:
-					writer.println("normal" + "," + columnNum);
+					writer.println("normal" + "," + columnNum + "," + dataLocationPath + "," + modelExecutablePath);
 					writer.close();
 					break;
 				case 2: 
-					writer.println("strict" + "," + columnNum);
+					writer.println("strict" + "," + columnNum + "," + dataLocationPath + "," + modelExecutablePath);
 					writer.close();
 					break;
 			}
@@ -238,5 +305,20 @@ public class SystemGUI extends JFrame {
 		}
 		
 	}
-	
+
+	//Getters
+	public String getDataLocationFilePath() {
+		return dataLocationFilePath;
+	}
+	public String getModelExecutableFilePath() {
+		return modelExecutableFilePath;
+	}
+
+	//Setters
+	public void setDataLocationFilePath(String dataLocationFilePath) {
+		this.dataLocationFilePath = dataLocationFilePath;
+	}
+	public void setModelExecutableFilePath(String modelExecutableFilePath) {
+		this.modelExecutableFilePath = modelExecutableFilePath;
+	}
 }
